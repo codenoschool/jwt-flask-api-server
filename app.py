@@ -44,23 +44,6 @@ class FrameworkSchema(Schema):
 
 framework_schema = FrameworkSchema()
 
-frameworks = [
-        {
-            "id": 1,
-            "name": "Flask"
-            },
-        {
-            "id": 2,
-            "name": "Angular"
-            },
-        {
-            "id": 3,
-            "name": "Laravel"
-            },
-        ]
-
-ID = 4
-
 @app.route("/api/frameworks", methods=["GET"])
 def get_frameworks():
     frameworks = Framework.query.all()
@@ -76,13 +59,18 @@ def get_frameworks():
 
 @app.route("/api/frameworks/<int:id>")
 def get_framework(id):
-    framework = {}
-    for f in frameworks:
-        if f["id"] == id:
-            framework = f
-            break
+    framework = Framework.query.get(id)
 
-    return jsonify(framework)
+    if not framework:
+
+        return jsonify({
+            "message": "Data not found",
+            "status_code": 404
+            }), 404
+
+    framework_json = framework_schema.dump(framework)
+
+    return framework_json
 
 @app.route("/api/frameworks", methods=["POST"])
 def create_framework():
@@ -112,28 +100,30 @@ def create_framework():
 
 @app.route("/api/frameworks/<int:id>", methods=["PUT"])
 def update_framework(id):
-    framework = [f for f in frameworks if f["id"] == id]
+    framework = Framework.query.get(id)
 
-    if framework:
-        framework = framework[0]
-        framework["name"] = request.json["name"]
-
-        return framework
-    else:
+    if not framework:
 
         return jsonify({
             "message": "Data not found",
             "status_code": 404
             }), 404
 
+    framework.name = request.json["name"]
+
+    db.session.commit()
+
+    framework_json = framework_schema.dump(framework)
+
+    return framework_json
+    
 @app.route("/api/frameworks/<int:id>", methods=["DELETE"])
 def destroy_framework(id):
-    framework = [f for f in frameworks if f["id"] == id]
+    framework = Framework.query.get(id)
 
     if framework:
-        framework = framework[0]
-
-        frameworks.remove(framework)
+        db.session.delete(framework)
+        db.session.commit()
 
         return {}, 204
     else:
