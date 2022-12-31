@@ -67,3 +67,19 @@ def create_framework():
 
     return new_framework
 
+@app.route("/api/frameworks/<int:id>", methods=["PUT"])
+def update_framework(id):
+    framework = [f for f in frameworks if f["id"] == id]
+
+    if framework:
+        framework = framework[0]
+        framework["name"] = request.json["name"]
+
+        return framework
+    else:
+
+        return jsonify({
+            "message": "Data not found",
+            "status_code": 404
+            }), 404
+
