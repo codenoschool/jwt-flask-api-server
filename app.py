@@ -211,6 +211,12 @@ def update_framework(id):
             "status_code": 404
             }), 404
 
+    if framework.author_id != user.id:
+        return {
+            "message": "Forbidden",
+            "status_code": 403
+            }, 403
+
     framework.name = request.json["name"]
 
     db.session.commit()
@@ -252,6 +258,12 @@ def destroy_framework(id):
     framework = Framework.query.get(id)
 
     if framework:
+        if framework.author_id != user.id:
+            return {
+                "message": "Forbidden",
+                "status_code": 403
+                }, 403
+
         db.session.delete(framework)
         db.session.commit()
 
