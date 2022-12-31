@@ -34,6 +34,51 @@ flask --debug run
 
 ... And that's it.
 
+# How to create the database
+
+If you just have cloned this repository, all you need is to have your
+python virtual environment with the requirements installed and the execute:
+
+```
+# These commands are exeucted while having the python venv activated.
+flask shell
+```
+
+That command will open up a python virtual enviroment with a flask contenxt
+application. There, you'll execute:
+
+```sh
+db.create_all()
+
+```
+
+That's enough to create the database models defined in `app.py`.
+
+If you have set a database URI connection for SQLite (which is the default),
+you can inspect the database with `sqlite` (if you have it installed):
+
+```sh
+sqlite development.sqlite3
+```
+
+That'll open open up a sqlite3 interactive ssession and you can perform
+SQL statements there, for example:
+
+```sh
+# See the schema of the database
+.schema
+# Execute a SQL statement
+select * from frameworks;
+# Exit the sqlite3 interactive session
+.exit
+```
+
+If you neeed a different database manager, you only need to change
+the URI passed as a parameter to the `app.config["SQLALCHEMY_DATABASE_URI"]`
+configuration in the file `app.py`. Of course, depending on your choice,
+you may need to install additional packages and/or connectors in your
+system and/or python virtual environment.
+
 # How to consume the API
 
 The API offers different endpoints to consume, you can perform requests
