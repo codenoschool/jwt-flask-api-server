@@ -8,6 +8,8 @@ from flask import request
 
 from flask_sqlalchemy import SQLAlchemy
 
+from marshmallow import Schema, fields
+
 import json
 
 import os
@@ -36,6 +38,12 @@ class Framework(db.Model):
 
         return f"Framework(id={self.id}, name={self.name})"
 
+class FrameworkSchema(Schema):
+    id = fields.Int()
+    name = fields.Str()
+
+framework_schema = FrameworkSchema()
+
 frameworks = [
         {
             "id": 1,
@@ -55,11 +63,9 @@ ID = 4
 
 @app.route("/api/frameworks", methods=["GET"])
 def get_frameworks():
-    frameworks_json = json.dumps(
-            frameworks,
-            indent=4,
-            separators=(", ", ": ")
-            )
+    frameworks = Framework.query.all()
+
+    frameworks_json = framework_schema.dump(frameworks, many=True)
 
     response = make_response(
             frameworks_json,
