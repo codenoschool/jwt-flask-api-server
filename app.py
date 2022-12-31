@@ -20,6 +20,8 @@ import os
 
 import jwt
 
+import functools
+
 BASE_DIR = os.path.dirname(__file__)
 DB_FILE = os.path.join(BASE_DIR, "development.sqlite3")
 SQLITE_DB_URI = "sqlite:///" + DB_FILE
@@ -32,6 +34,41 @@ app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_DB_URI
 app.config["SECRET_KEY"] = "sk"
 
 db = SQLAlchemy(app)
+
+def jwt_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        try:
+            decoded_jwt = jwt.decode(
+                    request.headers["JWT"],
+                    app.config["SECRET_KEY"],
+                    algorithms=["HS256"]
+                    )
+
+            user = User.query.get(decoded_jwt["user_id"])
+
+            if not user:
+
+                return jsonify({
+                    "message": "Data not found",
+                    "status_code": 404
+                    }), 404
+        except jwt.exceptions.ExpiredSignatureError:
+
+            return {
+                    "message": "Login time-out",
+                    "status_code": 440
+                    }, 440
+        except:
+
+            return {
+                    "message": "Forbidden",
+                    "status_code": 403
+                    }, 403
+
+        return view(decoded_jwt, user, **kwargs)
+
+    return wrapped_view
 
 class Framework(db.Model):
     __tablename__ = "frameworks"
@@ -121,35 +158,8 @@ def get_framework(id):
     return framework_json
 
 @app.route("/api/frameworks", methods=["POST"])
-def create_framework():
-    try:
-        decoded_jwt = jwt.decode(
-                request.headers["JWT"],
-                app.config["SECRET_KEY"],
-                algorithms=["HS256"]
-                )
-
-        user = User.query.get(decoded_jwt["user_id"])
-
-        if not user:
-
-            return jsonify({
-                "message": "Data not found",
-                "status_code": 404
-                }), 404
-    except jwt.exceptions.ExpiredSignatureError:
-
-        return {
-                "message": "Login time-out",
-                "status_code": 440
-                }, 440
-    except:
-
-        return {
-                "message": "Forbidden",
-                "status_code": 403
-                }, 403
-
+@jwt_required
+def create_framework(decoded_jwt, user):
     framework = Framework.query.filter_by(
             name=request.json["name"]).first()
 
@@ -173,35 +183,8 @@ def create_framework():
     return new_framework_dict
 
 @app.route("/api/frameworks/<int:id>", methods=["PUT"])
-def update_framework(id):
-    try:
-        decoded_jwt = jwt.decode(
-                request.headers["JWT"],
-                app.config["SECRET_KEY"],
-                algorithms=["HS256"]
-                )
-
-        user = User.query.get(decoded_jwt["user_id"])
-
-        if not user:
-
-            return jsonify({
-                "message": "Data not found",
-                "status_code": 404
-                }), 404
-    except jwt.exceptions.ExpiredSignatureError:
-
-        return {
-                "message": "Login time-out",
-                "status_code": 440
-                }, 440
-    except:
-
-        return {
-                "message": "Forbidden",
-                "status_code": 403
-                }, 403
-
+@jwt_required
+def update_framework(decoded_jwt, user, id):
     framework = Framework.query.get(id)
 
     if not framework:
@@ -226,35 +209,8 @@ def update_framework(id):
     return framework_json
     
 @app.route("/api/frameworks/<int:id>", methods=["DELETE"])
-def destroy_framework(id):
-    try:
-        decoded_jwt = jwt.decode(
-                request.headers["JWT"],
-                app.config["SECRET_KEY"],
-                algorithms=["HS256"]
-                )
-
-        user = User.query.get(decoded_jwt["user_id"])
-
-        if not user:
-
-            return jsonify({
-                "message": "Data not found",
-                "status_code": 404
-                }), 404
-    except jwt.exceptions.ExpiredSignatureError:
-
-        return {
-                "message": "Login time-out",
-                "status_code": 440
-                }, 440
-    except:
-
-        return {
-                "message": "Forbidden",
-                "status_code": 403
-                }, 403
-
+@jwt_required
+def destroy_framework(decoded_jwt, user, id):
     framework = Framework.query.get(id)
 
     if framework:
