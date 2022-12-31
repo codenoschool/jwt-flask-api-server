@@ -1,5 +1,8 @@
 from flask import Flask
+
 from flask import make_response
+
+from flask import jsonify
 
 import json
 
@@ -35,3 +38,12 @@ def get_frameworks():
 
     return response
 
+@app.route("/api/frameworks/<int:id>")
+def get_framework(id):
+    framework = {}
+    for f in frameworks:
+        if f["id"] == id:
+            framework = f
+            break
+
+    return jsonify(framework)
