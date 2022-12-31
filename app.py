@@ -83,3 +83,20 @@ def update_framework(id):
             "status_code": 404
             }), 404
 
+@app.route("/api/frameworks/<int:id>", methods=["DELETE"])
+def destroy_framework(id):
+    framework = [f for f in frameworks if f["id"] == id]
+
+    if framework:
+        framework = framework[0]
+
+        frameworks.remove(framework)
+
+        return {}, 204
+    else:
+
+        return jsonify({
+            "message": "Data not found",
+            "status_code": 404
+            }), 404
+
