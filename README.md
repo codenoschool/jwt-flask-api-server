@@ -115,6 +115,7 @@ curl \
   --data '{ "name": "AngularJS" }' \
   --request POST \
   --header "Content-Type: application/json" \
+  --header "JWT: <Paste here your JWT>" \
   --include \
   http://127.0.0.1:5000/api/frameworks
 ```
@@ -129,6 +130,7 @@ curl \
   --data @fourth_framework.json
   --request PUT \
   --header "Content-Type: application/json" \
+  --header "JWT: <Paste here your JWT>" \
   --include \
   http://127.0.0.1:5000/api/frameworks/2
 ```
@@ -183,12 +185,13 @@ You can perform a request a request, that could be seen as intimidating in
 cURL, in HTTPie just as easy as this:
 
 ```sh
-http POST :5000/api/frameworks name=VueJS
+http POST :5000/api/frameworks name=VueJS JWT:<Paste your JWT here>
 ```
 
 Much cleaner, much easier. The request URL is assumed to be "localhost" or
 "http://127.0.0.1" and that's the reason why only the port needs to be
-specified. The request is sent as JSON content type automatically.
+specified. The request is sent as JSON content type automatically. A 
+header with name of JWT and a value of "whatever is specified after : (the dot column sign) is specified" is sent with the request.
 
 If you need more examples you may want to execute:
 
