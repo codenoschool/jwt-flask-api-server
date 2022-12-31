@@ -27,7 +27,7 @@ class Framework(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String(50))
+    name = db.Column(db.String(50), unique=True)
 
     def __init__(self, name):
         self.name = name
@@ -80,18 +80,29 @@ def get_framework(id):
 
 @app.route("/api/frameworks", methods=["POST"])
 def create_framework():
-    global ID
+    framework = Framework.query.filter_by(
+            name=request.json["name"]).first()
 
-    new_framework = {
-            "id": ID,
-            "name": request.json["name"]
+    if framework:
+
+        return {
+                "message": "Conflict",
+                "status_code": 409
+                }, 409
+
+    new_framework = Framework(
+            name=request.json["name"]
+            )
+
+    db.session.add(new_framework)
+    db.session.commit()
+
+    new_framework_dict = {
+            "id": new_framework.id,
+            "name": new_framework.name
             }
 
-    frameworks.append(new_framework)
-
-    ID += 1
-
-    return new_framework
+    return new_framework_dict
 
 @app.route("/api/frameworks/<int:id>", methods=["PUT"])
 def update_framework(id):
