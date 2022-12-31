@@ -4,6 +4,8 @@ from flask import make_response
 
 from flask import jsonify
 
+from flask import request
+
 import json
 
 app = Flask(__name__)
@@ -22,6 +24,8 @@ frameworks = [
             "name": "Laravel"
             },
         ]
+
+ID = 4
 
 @app.route("/api/frameworks", methods=["GET"])
 def get_frameworks():
@@ -47,3 +51,19 @@ def get_framework(id):
             break
 
     return jsonify(framework)
+
+@app.route("/api/frameworks", methods=["POST"])
+def create_framework():
+    global ID
+
+    new_framework = {
+            "id": ID,
+            "name": request.json["name"]
+            }
+
+    frameworks.append(new_framework)
+
+    ID += 1
+
+    return new_framework
+
