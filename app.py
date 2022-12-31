@@ -6,9 +6,35 @@ from flask import jsonify
 
 from flask import request
 
+from flask_sqlalchemy import SQLAlchemy
+
 import json
 
+import os
+
+BASE_DIR = os.path.dirname(__file__)
+DB_FILE = os.path.join(BASE_DIR, "development.sqlite3")
+SQLITE_DB_URI = "sqlite:///" + DB_FILE
+
 app = Flask(__name__)
+app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+app.config["SQLALCHEMY_DATABASE_URI"] = SQLITE_DB_URI
+
+db = SQLAlchemy(app)
+
+class Framework(db.Model):
+    __tablename__ = "frameworks"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    name = db.Column(db.String(50))
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+
+        return f"Framework(id={self.id}, name={self.name})"
 
 frameworks = [
         {
