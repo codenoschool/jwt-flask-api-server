@@ -131,11 +131,11 @@ After that, you'll have the command `http` available:
 ```sh
 # Run HTTPie
 http
-# You'll get a simple help text after executing the last command
+# You'll get a simple help text after executing that last command
 ```
 
 You can perform a request a request, that could be seen as intimidating in
-cURL, in HTTPie just easy as this:
+cURL, in HTTPie just as easy as this:
 
 ```sh
 http POST :5000/api/frameworks name=VueJS
