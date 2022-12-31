@@ -20,8 +20,8 @@ frameworks = [
             },
         ]
 
-@app.route("/api/frameworks")
-def index():
+@app.route("/api/frameworks", methods=["GET"])
+def get_frameworks():
     frameworks_json = json.dumps(
             frameworks,
             indent=4,
